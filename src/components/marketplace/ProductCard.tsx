@@ -40,7 +40,7 @@ const categoryConfig = {
   housing: { label: 'Housing', color: 'bg-purple-500/20 text-purple-400' },
 };
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const config = categoryConfig[product.category];
 
   return (

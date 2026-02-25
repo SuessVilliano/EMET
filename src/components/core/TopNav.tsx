@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Bell, Search, Sun, Moon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Bell, Search } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 interface TopNavProps {

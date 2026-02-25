@@ -100,10 +100,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ingested: 0, message: 'All alerts already exist' })
   }
 
-  const { error, count } = await supabase
+  const { error } = await supabase
     .from('news_alerts')
     .insert(toInsert)
-    .select('id', { count: 'exact', head: true })
 
   if (error) {
     console.error('Supabase insert error:', error)
@@ -116,7 +115,7 @@ export async function POST(req: Request) {
   })
 
   return NextResponse.json({
-    ingested: count ?? toInsert.length,
+    ingested: toInsert.length,
     total_fetched: rows.length,
     deduplicated: unique.length,
     new: toInsert.length,

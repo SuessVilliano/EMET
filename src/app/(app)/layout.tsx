@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthProvider'
 import { Sidebar } from '@/components/core/Sidebar'
@@ -22,8 +21,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { user, walletAddress, isConnected, disconnect } = useAuth()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const { walletAddress, disconnect } = useAuth()
 
   const pageInfo = PAGE_TITLES[pathname] || { title: 'EMET' }
 

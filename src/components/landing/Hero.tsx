@@ -1,8 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowRight, Droplets, Sun, Sprout, Home, Scale, Vote } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  left: `${seededRandom(i * 4 + 1) * 100}%`,
+  top: `${seededRandom(i * 4 + 2) * 100}%`,
+  duration: `${5 + seededRandom(i * 4 + 3) * 5}s`,
+  delay: `${seededRandom(i * 4 + 4) * 2}s`,
+}));
 
 interface HeroProps {
   onConnectWallet?: () => void;
@@ -10,11 +22,6 @@ interface HeroProps {
 }
 
 export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
-  const [particleCount, setParticleCount] = useState(0);
-
-  useEffect(() => {
-    setParticleCount(20);
-  }, []);
 
   const features = [
     { icon: Droplets, label: 'Water' },
@@ -29,15 +36,15 @@ export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
     <div className="relative min-h-screen bg-[#0a0f1a] overflow-hidden flex flex-col items-center justify-center pt-20 pb-10">
       {/* Animated background particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: particleCount }).map((_, i) => (
+        {PARTICLES.map((p, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-primary rounded-full opacity-20 animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${5 + Math.random() * 5}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
+              left: p.left,
+              top: p.top,
+              animation: `float ${p.duration} ease-in-out infinite`,
+              animationDelay: p.delay,
             }}
           />
         ))}

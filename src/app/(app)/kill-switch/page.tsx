@@ -9,7 +9,7 @@ export default function KillSwitchPage() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-white mb-4">Kill Switch</h1>
         <p className="text-slate-400 max-w-2xl mx-auto">
-          The community's ultimate safeguard. If EMET strays from its mission to
+          The community&apos;s ultimate safeguard. If EMET strays from its mission to
           protect truth and human resilience, you have the power to shut it down.
         </p>
       </div>
@@ -122,7 +122,7 @@ export default function KillSwitchPage() {
             <p className="text-sm font-mono text-slate-500 mb-2">REQUIREMENT 2</p>
             <p className="text-white font-semibold">Majority</p>
             <p className="text-slate-400 text-sm mt-2">
-              66% must vote "SHUT DOWN" to trigger
+              66% must vote &quot;SHUT DOWN&quot; to trigger
             </p>
           </div>
           <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-6">

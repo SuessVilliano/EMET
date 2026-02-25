@@ -9,12 +9,11 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- standard hydration guard
   }, []);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
-    // In a real app, you'd dispatch this to a context or localStorage
     if (typeof document !== 'undefined') {
       if (!isDark) {
         document.documentElement.classList.add('dark');

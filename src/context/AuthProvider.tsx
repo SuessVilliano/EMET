@@ -3,6 +3,17 @@
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
 import type { User } from '@/lib/types';
 
+interface PhantomWallet {
+  isPhantom: boolean;
+  connect: () => Promise<{ publicKey: { toString: () => string } }>;
+  disconnect: () => Promise<void>;
+}
+
+function getPhantom(): PhantomWallet | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return (window as unknown as { solana?: PhantomWallet }).solana;
+}
+
 interface AuthContextType {
   user: User | null;
   walletAddress: string | null;
@@ -30,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsConnecting(true);
     try {
       // Check for Phantom wallet (Solana wallet)
-      const phantom = (window as any)?.solana;
+      const phantom = getPhantom();
 
       if (phantom?.isPhantom) {
         try {
@@ -76,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setWalletAddress(null);
 
     // Disconnect Phantom if available
-    const phantom = (window as any)?.solana;
+    const phantom = getPhantom();
     if (phantom?.isPhantom) {
       phantom.disconnect().catch((err: Error) => console.error('Disconnect error:', err));
     }

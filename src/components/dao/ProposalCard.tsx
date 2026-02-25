@@ -28,7 +28,7 @@ const statusConfig = {
   FAILED: { bg: 'bg-destructive/20', text: 'text-destructive', label: 'Failed' },
 };
 
-export function ProposalCard({ proposal, onVote }: ProposalCardProps) {
+export function ProposalCard({ proposal }: ProposalCardProps) {
   const config = statusConfig[proposal.status];
   const yesPercentage = proposal.totalVotes > 0 ? (proposal.yesVotes / proposal.totalVotes) * 100 : 0;
   const noPercentage = proposal.totalVotes > 0 ? (proposal.noVotes / proposal.totalVotes) * 100 : 0;

@@ -20,9 +20,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('emet-theme') as Theme | null;
-    if (saved && (saved === 'dark' || saved === 'light')) {
-      setTheme(saved);
+    const saved = localStorage.getItem('emet-theme');
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved); // eslint-disable-line react-hooks/set-state-in-effect -- hydration: sync with localStorage
     }
     setIsMounted(true);
   }, []);

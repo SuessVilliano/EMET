@@ -78,7 +78,7 @@ export function ChatInterface({
               Welcome to EMET
             </h3>
             <p className="text-gray-400 text-sm mt-2 max-w-xs">
-              Ask me anything about water, energy, food, housing, or legal matters. I'm here to help protect the truth.
+              Ask me anything about water, energy, food, housing, or legal matters. I&apos;m here to help protect the truth.
             </p>
           </div>
         ) : (
