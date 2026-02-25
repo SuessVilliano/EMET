@@ -7,6 +7,15 @@
   "functions": {
     "src/app/api/chat/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/news/ingest/route.ts": {
+      "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/news/ingest",
+      "schedule": "*/10 * * * *"
+    }
+  ]
 }

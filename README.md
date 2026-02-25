@@ -30,6 +30,9 @@ AI Guardian for Humanity -- a DAO-governed resilience platform built with Next.j
 | `GOOGLE_GENERATIVE_AI_API_KEY` | No | [aistudio.google.com](https://aistudio.google.com) |
 | `OPENAI_API_KEY` | No | [platform.openai.com](https://platform.openai.com) |
 | `ANTHROPIC_API_KEY` | No | [console.anthropic.com](https://console.anthropic.com) |
+| `WORLDMONITOR_API_URL` | No | Defaults to `https://worldmonitor.app` |
+| `WORLDMONITOR_API_KEY` | No | For authenticated World Monitor access |
+| `CRON_SECRET` | No | Protects the `/api/news/ingest` cron endpoint |
 | `NEXT_PUBLIC_SOLANA_RPC_URL` | No | Defaults to devnet |
 | `NEXT_PUBLIC_SOLANA_NETWORK` | No | Defaults to `devnet` |
 | `JWT_SECRET` | No | Any random 32+ character string |
@@ -61,6 +64,25 @@ EMET uses a multi-provider architecture with automatic fallback:
 
 Configure as many or as few providers as you want. The system picks the best available model for each task type and falls back automatically if one is unavailable.
 
+## World Monitor Integration
+
+EMET pulls real-time global intelligence from [World Monitor](https://github.com/SuessVilliano/worldmonitor) and feeds it into the `news_alerts` table. A Vercel Cron job runs every 10 minutes, polling 6 data sources:
+
+| Source | World Monitor API | EMET Category |
+|---|---|---|
+| Social unrest | `/api/unrest/v1/list-unrest-events` | Contextual (water/energy/food/housing/finance/legal) |
+| Armed conflict | `/api/conflict/v1/list-acled-events` | `legal` |
+| Cyber threats | `/api/cyber/v1/list-cyber-threats` | `legal` |
+| Energy prices | `/api/economic/v1/get-energy-prices` | `energy` |
+| Internet outages | `/api/infrastructure/v1/list-internet-outages` | `finance` |
+| Climate anomalies | `/api/climate/v1/list-climate-anomalies` | `water` / `food` |
+
+Alerts are deduplicated against the last 24 hours. Threat levels map directly from World Monitor severity scores (LOW/MEDIUM/HIGH/CRITICAL).
+
+**Endpoints:**
+- `GET /api/news/alerts?category=energy&threat_level=high&limit=50` -- read alerts
+- `POST /api/news/ingest` -- trigger ingestion manually (cron runs automatically)
+
 ## Database Schema
 
 The schema in `src/lib/db/schema.sql` creates:
@@ -84,6 +106,8 @@ src/
     (app)/          # Authenticated routes (dashboard, chat, dao, marketplace, etc.)
     (auth)/         # Auth routes
     api/chat/       # Streaming AI chat endpoint
+    api/news/ingest/ # World Monitor ingestion cron
+    api/news/alerts/ # News alerts query endpoint
   components/
     core/           # AppShell, Sidebar, TopNav
     chat/           # ChatInterface, EmetAvatar
@@ -95,6 +119,7 @@ src/
     ai/             # Multi-LLM router, EMET persona
     db/             # Supabase client, schema.sql
     blockchain/     # DAO, kill-switch, audit ledger
+    worldmonitor/   # World Monitor API client + mapper
 ```
 
 ## Tech Stack
@@ -104,4 +129,5 @@ src/
 - **AI**: Vercel AI SDK with Groq, Google, OpenAI, Anthropic providers
 - **Styling**: Tailwind CSS v4
 - **State**: Zustand
+- **News Intelligence**: [World Monitor](https://github.com/SuessVilliano/worldmonitor) (ACLED, GDELT, EIA, Cloudflare Radar, NASA FIRMS)
 - **Deployment**: Vercel
