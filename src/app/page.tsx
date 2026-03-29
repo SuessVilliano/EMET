@@ -1,21 +1,45 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthProvider'
 import { Hero } from '@/components/landing/Hero'
 import { FeatureCards } from '@/components/landing/FeatureCards'
 
 export default function Home() {
+  const router = useRouter()
+  const { connect, isConnected, isConnecting } = useAuth()
+
+  // Auto-redirect to dashboard if already connected
+  useEffect(() => {
+    if (isConnected) {
+      router.push('/dashboard')
+    }
+  }, [isConnected, router])
+
+  const handleConnectWallet = async () => {
+    if (isConnected) {
+      router.push('/dashboard')
+    } else {
+      await connect()
+    }
+  }
+
+  const handleLearnMore = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      {/* Hero Section */}
-      <Hero />
+      <Hero onConnectWallet={handleConnectWallet} onLearnMore={handleLearnMore} />
 
-      {/* Feature Cards Section */}
-      <section className="py-20 px-4 max-w-7xl mx-auto">
+      <section id="features" className="py-20 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12 text-white">
-          Why EMET Matters
+          Domains of Liberation
         </h2>
         <FeatureCards />
       </section>
 
-      {/* Stats Bar */}
       <section className="py-12 px-4 border-y border-slate-700/50">
         <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-12 text-center">
           <div>
@@ -37,7 +61,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
       <section className="py-20 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-16 text-white">
           How It Works
@@ -49,7 +72,7 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">Connect Wallet</h3>
             <p className="text-slate-400">
-              Connect your Web3 wallet to join the EMET community. Your wallet is your identity and your voice.
+              Connect your Solana wallet to join the EMET community. Your wallet is your identity and your voice.
             </p>
           </div>
 
@@ -59,7 +82,7 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">Explore Resources</h3>
             <p className="text-slate-400">
-              Browse and discover real-world solutions: water systems, solar tech, food security, and legal tools.
+              Discover real-world liberation tools: water systems, solar tech, food security, true history, and consciousness expansion.
             </p>
           </div>
 
@@ -69,17 +92,16 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">Join the DAO</h3>
             <p className="text-slate-400">
-              Vote on proposals, govern the AI, and shape the future of decentralized resilience together.
+              Vote on proposals, govern the AI, and shape the future of decentralized truth together. The people are sovereign.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-12 px-4 border-t border-slate-700/50 bg-slate-950/50">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-slate-400">
-            EMET — Built by the people, for the people. Truth protects.
+            EMET — Truth Made Alive. Built by the people, for the people.
           </p>
         </div>
       </footer>

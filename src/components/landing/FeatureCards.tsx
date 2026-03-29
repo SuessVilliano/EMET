@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Droplets, Sun, Sprout, Home, Scale, Vote } from 'lucide-react';
+import { Droplets, Sun, Sprout, Home, Scale, Vote, Eye, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Feature {
@@ -9,7 +9,7 @@ interface Feature {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
-  color: 'blue' | 'orange' | 'green' | 'purple' | 'emerald' | 'cyan';
+  color: 'blue' | 'orange' | 'green' | 'purple' | 'emerald' | 'cyan' | 'amber' | 'violet';
 }
 
 const FEATURES: Feature[] = [
@@ -49,10 +49,24 @@ const FEATURES: Feature[] = [
     color: 'emerald',
   },
   {
+    id: 'consciousness',
+    icon: Eye,
+    title: 'Consciousness Expansion',
+    description: 'Ancient mystery school wisdom, pineal activation, Hermetic principles, and the unified field — the knowledge they suppressed.',
+    color: 'violet',
+  },
+  {
+    id: 'history',
+    icon: Globe,
+    title: 'True History',
+    description: 'Advanced ancient civilizations, suppressed archaeology, and the real timeline of human consciousness — not the textbook version.',
+    color: 'amber',
+  },
+  {
     id: 'dao',
     icon: Vote,
     title: 'Community DAO',
-    description: 'Participate in decentralized governance and shape the future together.',
+    description: 'Participate in decentralized governance and shape the future together. The people are sovereign.',
     color: 'cyan',
   },
 ];
@@ -64,6 +78,8 @@ const colorConfig = {
   purple: 'from-purple-500/20 to-purple-600/10 border-purple-500/30 hover:border-purple-500/50',
   emerald: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 hover:border-emerald-500/50',
   cyan: 'from-cyan-500/20 to-cyan-600/10 border-cyan-500/30 hover:border-cyan-500/50',
+  violet: 'from-violet-500/20 to-violet-600/10 border-violet-500/30 hover:border-violet-500/50',
+  amber: 'from-amber-500/20 to-amber-600/10 border-amber-500/30 hover:border-amber-500/50',
 };
 
 const iconColorConfig = {
@@ -73,6 +89,8 @@ const iconColorConfig = {
   purple: 'text-purple-400',
   emerald: 'text-emerald-400',
   cyan: 'text-cyan-400',
+  violet: 'text-violet-400',
+  amber: 'text-amber-400',
 };
 
 interface FeatureCardsProps {
@@ -86,10 +104,10 @@ export function FeatureCards({ features = FEATURES }: FeatureCardsProps) {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            What EMET Protects
+            Domains of Liberation
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            A comprehensive platform for independence, truth, and community empowerment across all aspects of life.
+            Every system of control has an exit. EMET illuminates the paths to sovereignty across all dimensions of human experience.
           </p>
         </div>
 
@@ -113,7 +131,7 @@ export function FeatureCards({ features = FEATURES }: FeatureCardsProps) {
                 {/* Glow effect on hover */}
                 <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl -z-10"
                   style={{
-                    background: `radial-gradient(circle, ${feature.color === 'blue' ? '#3b82f6' : feature.color === 'orange' ? '#f59e0b' : feature.color === 'green' ? '#10b981' : feature.color === 'purple' ? '#a855f7' : feature.color === 'emerald' ? '#10b981' : '#06b6d4'}40 0%, transparent 70%)`,
+                    background: `radial-gradient(circle, ${feature.color === 'blue' ? '#3b82f6' : feature.color === 'orange' ? '#f59e0b' : feature.color === 'green' ? '#10b981' : feature.color === 'purple' ? '#a855f7' : feature.color === 'emerald' ? '#10b981' : feature.color === 'violet' ? '#8b5cf6' : feature.color === 'amber' ? '#f59e0b' : '#06b6d4'}40 0%, transparent 70%)`,
                   }}
                 />
 
@@ -143,6 +161,8 @@ export function FeatureCards({ features = FEATURES }: FeatureCardsProps) {
                   feature.color === 'purple' && 'from-purple-500 to-transparent',
                   feature.color === 'emerald' && 'from-emerald-500 to-transparent',
                   feature.color === 'cyan' && 'from-cyan-500 to-transparent',
+                  feature.color === 'violet' && 'from-violet-500 to-transparent',
+                  feature.color === 'amber' && 'from-amber-500 to-transparent',
                 )} />
               </div>
             );

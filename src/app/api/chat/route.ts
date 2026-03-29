@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         }
 
         // Determine task type based on domain
-        if (domain === 'legal' || domain === 'finance') {
+        if (domain === 'legal' || domain === 'finance' || domain === 'history' || domain === 'consciousness') {
           taskType = 'analysis'
         }
       }

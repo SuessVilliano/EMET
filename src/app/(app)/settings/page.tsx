@@ -1,12 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, LogOut, Moon, Sun } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Copy, LogOut, Moon, Sun, Check } from 'lucide-react'
+import { useAuth } from '@/context/AuthProvider'
+import { useTheme } from '@/context/ThemeProvider'
 
 export default function SettingsPage() {
-  const [displayName, setDisplayName] = useState('Alex Johnson')
-  const [email, setEmail] = useState('alex@example.com')
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const { walletAddress, disconnect } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+  const router = useRouter()
+
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [notifications, setNotifications] = useState({
     proposals: true,
     news: true,
@@ -14,10 +22,22 @@ export default function SettingsPage() {
     alerts: true,
   })
 
-  const walletAddress = '0x8a94d7B8E5F6c6E8D7B9A8C8D7B8A9B8C8D7B8A'
-
   const handleCopyAddress = () => {
-    navigator.clipboard.writeText(walletAddress)
+    if (walletAddress) {
+      navigator.clipboard.writeText(walletAddress)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleDisconnect = () => {
+    disconnect()
+    router.push('/')
+  }
+
+  const handleSave = () => {
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
   }
 
   return (
@@ -34,7 +54,7 @@ export default function SettingsPage() {
             <div className="flex gap-3">
               <input
                 type="text"
-                value={walletAddress}
+                value={walletAddress || 'Not Connected'}
                 readOnly
                 className="flex-1 px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-sm"
               />
@@ -42,7 +62,7 @@ export default function SettingsPage() {
                 onClick={handleCopyAddress}
                 className="px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-300 transition"
               >
-                <Copy className="w-5 h-5" />
+                {copied ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -52,14 +72,17 @@ export default function SettingsPage() {
               Connection Status
             </label>
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+              <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
               <span className="text-white font-semibold">Connected</span>
-              <span className="text-slate-500">Ethereum Mainnet</span>
+              <span className="text-slate-500">Solana Devnet</span>
             </div>
           </div>
         </div>
 
-        <button className="mt-6 px-6 py-3 rounded-lg border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-slate-600 transition font-semibold flex items-center gap-2">
+        <button
+          onClick={handleDisconnect}
+          className="mt-6 px-6 py-3 rounded-lg border border-slate-700 bg-slate-900/50 text-slate-300 hover:border-red-500/50 hover:text-red-400 transition font-semibold flex items-center gap-2"
+        >
           <LogOut className="w-5 h-5" />
           Disconnect Wallet
         </button>
@@ -78,7 +101,8 @@ export default function SettingsPage() {
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 transition"
+              placeholder="Enter a display name"
+              className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
             />
           </div>
 
@@ -106,26 +130,10 @@ export default function SettingsPage() {
 
         <div className="space-y-4">
           {[
-            {
-              key: 'proposals',
-              label: 'Proposal Updates',
-              description: 'Get notified when new DAO proposals are created',
-            },
-            {
-              key: 'news',
-              label: 'News Alerts',
-              description: 'Receive critical news and threat level updates',
-            },
-            {
-              key: 'community',
-              label: 'Community Messages',
-              description: 'Notifications from channels you follow',
-            },
-            {
-              key: 'alerts',
-              label: 'Security Alerts',
-              description: 'Important system and security notifications',
-            },
+            { key: 'proposals', label: 'Proposal Updates', description: 'Get notified when new DAO proposals are created' },
+            { key: 'news', label: 'News Alerts', description: 'Receive critical news and threat level updates' },
+            { key: 'community', label: 'Community Messages', description: 'Notifications from channels you follow' },
+            { key: 'alerts', label: 'Security Alerts', description: 'Important system and security notifications' },
           ].map((item) => (
             <div
               key={item.key}
@@ -138,15 +146,8 @@ export default function SettingsPage() {
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={
-                    notifications[item.key as keyof typeof notifications]
-                  }
-                  onChange={(e) =>
-                    setNotifications({
-                      ...notifications,
-                      [item.key]: e.target.checked,
-                    })
-                  }
+                  checked={notifications[item.key as keyof typeof notifications]}
+                  onChange={(e) => setNotifications({ ...notifications, [item.key]: e.target.checked })}
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500/30"></div>
@@ -156,13 +157,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Theme Preference */}
+      {/* Theme */}
       <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-8">
         <h2 className="text-2xl font-bold text-white mb-6">Appearance</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={() => setTheme('dark')}
+            onClick={() => { if (theme !== 'dark') toggleTheme() }}
             className={`p-6 rounded-lg border-2 transition ${
               theme === 'dark'
                 ? 'border-emerald-500 bg-emerald-500/10'
@@ -174,7 +175,7 @@ export default function SettingsPage() {
           </button>
 
           <button
-            onClick={() => setTheme('light')}
+            onClick={() => { if (theme !== 'light') toggleTheme() }}
             className={`p-6 rounded-lg border-2 transition ${
               theme === 'light'
                 ? 'border-emerald-500 bg-emerald-500/10'
@@ -187,10 +188,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Save Button */}
+      {/* Save */}
       <div className="flex justify-end">
-        <button className="px-8 py-3 rounded-lg bg-emerald-500/20 border border-emerald-500 text-emerald-400 hover:bg-emerald-500/30 transition font-bold">
-          Save Changes
+        <button
+          onClick={handleSave}
+          className="px-8 py-3 rounded-lg bg-emerald-500/20 border border-emerald-500 text-emerald-400 hover:bg-emerald-500/30 transition font-bold"
+        >
+          {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
     </div>

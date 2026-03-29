@@ -67,10 +67,32 @@ const generalMessages: Message[] = [
 ]
 
 export default function CommunityPage() {
-  const [selectedChannel, setSelectedChannel] = useState('general')
+  const [selectedChannel, setSelectedChannel] = useState('1')
   const [messageInput, setMessageInput] = useState('')
+  const [messages, setMessages] = useState(generalMessages)
 
   const currentChannel = channels.find((c) => c.id === selectedChannel) || channels[0]
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return
+    const newMsg: Message = {
+      id: Date.now().toString(),
+      author: 'You',
+      avatar: 'YO',
+      content: messageInput.trim(),
+      timestamp: 'Just now',
+      reactions: 0,
+    }
+    setMessages((prev) => [...prev, newMsg])
+    setMessageInput('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
 
   return (
     <div className="flex gap-6 h-[calc(100vh-180px)]">
@@ -122,7 +144,7 @@ export default function CommunityPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {generalMessages.map((msg) => (
+          {messages.map((msg) => (
             <div key={msg.id} className="flex gap-4">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-blue-400 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold text-sm">
@@ -155,10 +177,15 @@ export default function CommunityPage() {
               type="text"
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               className="flex-1 px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
             />
-            <button className="px-4 py-3 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/30 transition">
+            <button
+              onClick={handleSendMessage}
+              disabled={!messageInput.trim()}
+              className="px-4 py-3 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Send className="w-5 h-5" />
             </button>
           </div>

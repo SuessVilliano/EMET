@@ -1,15 +1,17 @@
-'use client';
+'use client'
 
-import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { User } from '@/lib/types';
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import type { User } from '@/lib/types'
 
 interface AuthContextType {
-  user: User | null;
-  walletAddress: string | null;
-  isConnected: boolean;
-  connect: () => Promise<void>;
-  disconnect: () => void;
-  isConnecting: boolean;
+  user: User | null
+  walletAddress: string | null
+  isConnected: boolean
+  connect: () => Promise<void>
+  disconnect: () => void
+  isConnecting: boolean
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -19,85 +21,60 @@ const AuthContext = createContext<AuthContextType>({
   connect: async () => {},
   disconnect: () => {},
   isConnecting: false,
-});
+})
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const { publicKey, connected, disconnect: walletDisconnect, connecting } = useWallet()
+  const { setVisible } = useWalletModal()
+  const [user, setUser] = useState<User | null>(null)
+
+  // Sync wallet connection state to user
+  useEffect(() => {
+    if (connected && publicKey) {
+      const addr = publicKey.toBase58()
+      setUser({
+        id: crypto.randomUUID(),
+        wallet_address: addr,
+        role: 'member',
+        reputation_score: 0,
+        created_at: new Date().toISOString(),
+      })
+    } else if (!connected) {
+      setUser(null)
+    }
+  }, [connected, publicKey])
 
   const connect = useCallback(async () => {
-    setIsConnecting(true);
-    try {
-      // Check for Phantom wallet (Solana wallet)
-      const phantom = (window as any)?.solana;
-
-      if (phantom?.isPhantom) {
-        try {
-          const resp = await phantom.connect();
-          const addr = resp.publicKey.toString();
-          setWalletAddress(addr);
-          setUser({
-            id: crypto.randomUUID(),
-            wallet_address: addr,
-            role: 'member',
-            reputation_score: 0,
-            created_at: new Date().toISOString(),
-          });
-        } catch (err) {
-          console.error('Phantom wallet connection failed:', err);
-          // Fall through to demo mode on error
-          initializeDemoUser();
-        }
-      } else {
-        // Demo mode for development (no wallet installed)
-        initializeDemoUser();
-      }
-    } finally {
-      setIsConnecting(false);
-    }
-  }, []);
-
-  const initializeDemoUser = () => {
-    const demoAddr = 'EMET' + Math.random().toString(36).slice(2, 10) + 'Demo';
-    setWalletAddress(demoAddr);
-    setUser({
-      id: crypto.randomUUID(),
-      wallet_address: demoAddr,
-      username: 'Demo User',
-      role: 'member',
-      reputation_score: 0,
-      created_at: new Date().toISOString(),
-    });
-  };
+    setVisible(true)
+  }, [setVisible])
 
   const disconnect = useCallback(() => {
-    setUser(null);
-    setWalletAddress(null);
+    walletDisconnect()
+    setUser(null)
+  }, [walletDisconnect])
 
-    // Disconnect Phantom if available
-    const phantom = (window as any)?.solana;
-    if (phantom?.isPhantom) {
-      phantom.disconnect().catch((err: Error) => console.error('Disconnect error:', err));
-    }
-  }, []);
+  const walletAddress = publicKey?.toBase58() || null
 
-  const value: AuthContextType = {
-    user,
-    walletAddress,
-    isConnected: !!user,
-    connect,
-    disconnect,
-    isConnecting,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        walletAddress,
+        isConnected: connected && !!publicKey,
+        connect,
+        disconnect,
+        isConnecting: connecting,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error('useAuth must be used within AuthProvider')
   }
-  return context;
-};
+  return context
+}

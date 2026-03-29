@@ -1,30 +1,12 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/context/ThemeProvider'
+import { cn } from '@/lib/utils'
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    // In a real app, you'd dispatch this to a context or localStorage
-    if (typeof document !== 'undefined') {
-      if (!isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-  };
-
-  if (!mounted) return null;
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
 
   return (
     <button
@@ -42,5 +24,5 @@ export function ThemeToggle() {
         <Sun className="w-5 h-5 text-primary transition-all duration-300" />
       )}
     </button>
-  );
+  )
 }
