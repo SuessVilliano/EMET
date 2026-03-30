@@ -19,6 +19,8 @@
     "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.4",
     "@supabase/supabase-js": "^2.97.0",
+    "@tiplink/wallet-adapter": "^2.1.21",
+    "@tiplink/wallet-adapter-react-ui": "^1.0.0",
     "ai": "4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

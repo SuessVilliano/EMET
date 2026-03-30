@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/context/ThemeProvider'
 import { WalletProvider } from '@/context/WalletProvider'
@@ -44,11 +45,13 @@ export default function RootLayout({
       </head>
       <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
         <ThemeProvider>
-          <WalletProvider>
-            <AuthProvider>
-              {children}
-            </AuthProvider>
-          </WalletProvider>
+          <Suspense fallback={null}>
+            <WalletProvider>
+              <AuthProvider>
+                {children}
+              </AuthProvider>
+            </WalletProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
