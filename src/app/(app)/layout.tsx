@@ -3,8 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthProvider'
-import { Sidebar } from '@/components/core/Sidebar'
-import { TopNav } from '@/components/core/TopNav'
+import { AppShell } from '@/components/core/AppShell'
 
 const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
   '/dashboard': { title: 'Dashboard', subtitle: 'Overview of your resilience network' },
@@ -25,7 +24,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { walletAddress, isConnected, disconnect } = useAuth()
 
-  // Redirect to landing if not connected
   useEffect(() => {
     if (!isConnected) {
       router.push('/')
@@ -53,18 +51,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar
-        currentPath={pathname}
-        walletAddress={walletAddress || 'Not Connected'}
-        onDisconnect={handleDisconnect}
-      />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <TopNav title={pageInfo.title} subtitle={pageInfo.subtitle} notificationCount={3} />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <AppShell
+      currentPath={pathname}
+      walletAddress={walletAddress || 'Not Connected'}
+      onDisconnect={handleDisconnect}
+      pageTitle={pageInfo.title}
+      pageSubtitle={pageInfo.subtitle}
+      notificationCount={3}
+    >
+      {children}
+    </AppShell>
   )
 }

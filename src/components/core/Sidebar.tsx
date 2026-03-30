@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import {
   LayoutDashboard,
@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -45,15 +46,21 @@ interface SidebarProps {
   currentPath: string
   walletAddress: string
   onDisconnect: () => void
+  collapsed: boolean
+  onToggleCollapse: () => void
+  mobileOpen: boolean
+  onMobileClose: () => void
 }
 
 export function Sidebar({
   currentPath,
   walletAddress,
   onDisconnect,
+  collapsed,
+  onToggleCollapse,
+  mobileOpen,
+  onMobileClose,
 }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false)
-
   const truncateAddress = (address: string) => {
     if (address.length <= 10) return address
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -63,30 +70,49 @@ export function Sidebar({
     <aside
       className={cn(
         'fixed left-0 top-0 h-screen bg-[#0a0f1a] border-r border-primary/20 transition-all duration-300 ease-in-out flex flex-col z-50',
-        'lg:relative lg:z-0',
-        collapsed ? 'w-16' : 'w-60'
+        // Mobile: hidden by default, slide in when mobileOpen
+        'max-lg:-translate-x-full max-lg:w-60',
+        mobileOpen && 'max-lg:translate-x-0',
+        // Desktop: always visible, respects collapsed state
+        'lg:relative lg:z-0 lg:translate-x-0',
+        collapsed ? 'lg:w-16' : 'lg:w-60'
       )}
       aria-label="Main navigation"
     >
       {/* Logo */}
       <div className={cn(
         'flex items-center justify-between p-4 border-b border-primary/20',
-        collapsed ? 'flex-col gap-2' : ''
+        collapsed ? 'lg:flex-col lg:gap-2' : ''
       )}>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={onMobileClose}>
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold flex-shrink-0">
             E
           </div>
+          {(!collapsed || mobileOpen) && (
+            <div className="flex flex-col lg:hidden xl:flex">
+              <span className="font-bold text-white text-sm">EMET</span>
+              <span className="text-xs text-primary">Truth Made Alive</span>
+            </div>
+          )}
           {!collapsed && (
-            <div className="flex flex-col">
+            <div className="hidden lg:flex flex-col">
               <span className="font-bold text-white text-sm">EMET</span>
               <span className="text-xs text-primary">Truth Made Alive</span>
             </div>
           )}
         </Link>
+        {/* Mobile close button */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors"
+          onClick={onMobileClose}
+          className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors lg:hidden"
+          aria-label="Close sidebar"
+        >
+          <X className="w-4 h-4 text-primary" />
+        </button>
+        {/* Desktop collapse button */}
+        <button
+          onClick={onToggleCollapse}
+          className="hidden lg:block p-1.5 rounded-lg hover:bg-primary/10 transition-colors"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? (
@@ -103,11 +129,13 @@ export function Sidebar({
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = currentPath === item.path
+            const showLabel = !collapsed || mobileOpen
 
             return (
               <li key={item.id}>
                 <Link
                   href={item.path}
+                  onClick={onMobileClose}
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
                     'hover:bg-primary/10 relative group',
@@ -121,7 +149,7 @@ export function Sidebar({
                     'w-5 h-5 flex-shrink-0',
                     isActive ? 'text-primary' : 'text-primary/60 group-hover:text-primary'
                   )} />
-                  {!collapsed && (
+                  {showLabel && (
                     <span className={cn(
                       'text-sm font-medium transition-colors',
                       isActive ? 'text-primary' : 'text-gray-400 group-hover:text-white'
@@ -129,7 +157,7 @@ export function Sidebar({
                       {item.label}
                     </span>
                   )}
-                  {collapsed && (
+                  {collapsed && !mobileOpen && (
                     <div className="absolute left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                       {item.label}
                     </div>
@@ -144,16 +172,16 @@ export function Sidebar({
       {/* Wallet */}
       <div className={cn(
         'border-t border-primary/20 p-4 space-y-3',
-        collapsed ? 'flex flex-col items-center' : ''
+        collapsed && !mobileOpen ? 'flex flex-col items-center' : ''
       )}>
         <div className={cn(
           'flex items-center gap-2',
-          collapsed ? 'w-full justify-center' : ''
+          collapsed && !mobileOpen ? 'w-full justify-center' : ''
         )}>
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-bold text-primary">W</span>
           </div>
-          {!collapsed && (
+          {(!collapsed || mobileOpen) && (
             <span className="text-xs text-gray-400 font-mono">
               {truncateAddress(walletAddress)}
             </span>
@@ -164,12 +192,12 @@ export function Sidebar({
           className={cn(
             'w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg',
             'bg-destructive/10 hover:bg-destructive/20 text-destructive text-sm font-medium transition-colors',
-            collapsed ? 'p-2' : ''
+            collapsed && !mobileOpen ? 'p-2' : ''
           )}
           aria-label="Disconnect wallet"
         >
           <LogOut className="w-4 h-4" />
-          {!collapsed && <span>Disconnect</span>}
+          {(!collapsed || mobileOpen) && <span>Disconnect</span>}
         </button>
       </div>
     </aside>

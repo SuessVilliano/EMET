@@ -24,7 +24,8 @@ export function AppShell({
   pageSubtitle,
   notificationCount = 0,
 }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-[#0a0f1a]">
@@ -32,24 +33,35 @@ export function AppShell({
         currentPath={currentPath}
         walletAddress={walletAddress}
         onDisconnect={onDisconnect}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
       />
 
       <TopNav
         title={pageTitle}
         subtitle={pageSubtitle}
         notificationCount={notificationCount}
+        walletAddress={walletAddress}
+        onMenuToggle={() => setMobileOpen(!mobileOpen)}
+        onDisconnect={onDisconnect}
       />
 
-      <main className={cn('pt-16 min-h-screen transition-all duration-300', 'lg:ml-60')}>
+      <main className={cn(
+        'pt-16 min-h-screen transition-all duration-300',
+        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+      )}>
         <div className="p-4 lg:p-6">
           {children}
         </div>
       </main>
 
-      {sidebarOpen && (
+      {/* Mobile overlay */}
+      {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
       )}
