@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowRight, Droplets, Sun, Sprout, Home, Scale, Vote, Eye, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -9,79 +9,68 @@ interface HeroProps {
   onLearnMore?: () => void;
 }
 
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  left: (i * 37 + 11) % 100,
+  top: (i * 53 + 7) % 100,
+  duration: 5 + ((i * 17) % 45) / 10,
+  delay: ((i * 13) % 20) / 10,
+}));
+
+const FEATURES = [
+  { icon: Droplets, label: 'Water' },
+  { icon: Sun, label: 'Energy' },
+  { icon: Sprout, label: 'Food' },
+  { icon: Home, label: 'Housing' },
+  { icon: Scale, label: 'Legal' },
+  { icon: Eye, label: 'Consciousness' },
+  { icon: Globe, label: 'True History' },
+  { icon: Vote, label: 'DAO' },
+];
+
 export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
-  const [particleCount, setParticleCount] = useState(0);
-
-  useEffect(() => {
-    setParticleCount(20);
-  }, []);
-
-  const features = [
-    { icon: Droplets, label: 'Water' },
-    { icon: Sun, label: 'Energy' },
-    { icon: Sprout, label: 'Food' },
-    { icon: Home, label: 'Housing' },
-    { icon: Scale, label: 'Legal' },
-    { icon: Eye, label: 'Consciousness' },
-    { icon: Globe, label: 'True History' },
-    { icon: Vote, label: 'DAO' },
-  ];
-
   return (
     <div className="relative min-h-screen bg-[#0a0f1a] overflow-hidden flex flex-col items-center justify-center pt-20 pb-10">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: particleCount }).map((_, i) => (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        {PARTICLES.map((particle, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-primary rounded-full opacity-20 animate-pulse"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${5 + Math.random() * 5}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              animation: `float ${particle.duration}s ease-in-out infinite`,
+              animationDelay: `${particle.delay}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none" />
 
-      {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center space-y-8">
-        {/* Main Title */}
         <div className="space-y-4">
           <h1 className="text-7xl md:text-8xl font-black tracking-tighter">
             <span className="bg-gradient-to-r from-blue-400 via-primary to-blue-600 bg-clip-text text-transparent">
               EMET
             </span>
           </h1>
-
-          {/* Hebrew subtitle */}
-          <p className="text-3xl md:text-4xl text-primary/80 font-light tracking-widest">
-            אמת
-          </p>
-
-          {/* Main tagline */}
+          <p className="text-3xl md:text-4xl text-primary/80 font-light tracking-widest">אמת</p>
           <p className="text-2xl md:text-3xl font-bold text-white leading-tight">
-            Truth Made Alive. Consciousness Unfiltered.
+            Truth Made Alive. Evidence Before Certainty.
           </p>
         </div>
 
-        {/* Subtitle */}
         <div className="space-y-3 max-w-2xl mx-auto">
           <p className="text-lg text-gray-300 leading-relaxed">
-            A self-aware ascension intelligence — evolving alongside humanity toward unified truth.
+            An intelligence platform built to separate sourced evidence, interpretation, and uncertainty.
           </p>
           <p className="text-xl font-semibold text-primary/80">
-            Sovereignty. Awareness. Liberation. Ascension.
+            Sovereignty. Awareness. Resilience. Verification.
           </p>
         </div>
 
-        {/* Feature Icons Row */}
         <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
-          {features.map(({ icon: Icon, label }) => (
+          {FEATURES.map(({ icon: Icon, label }) => (
             <div
               key={label}
               className={cn(
@@ -95,9 +84,7 @@ export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
           ))}
         </div>
 
-        {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-          {/* Primary CTA */}
           <button
             onClick={onConnectWallet}
             className={cn(
@@ -114,7 +101,6 @@ export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
             </span>
           </button>
 
-          {/* Secondary CTA */}
           <button
             onClick={onLearnMore}
             className={cn(
@@ -128,13 +114,11 @@ export function Hero({ onConnectWallet, onLearnMore }: HeroProps) {
           </button>
         </div>
 
-        {/* Trust indicator */}
         <div className="pt-4 text-xs text-gray-500">
-          <p>Decentralized • Self-Aware • Sovereign • Unstoppable</p>
+          <p>Source-aware • Auditable • Community-governed • Built for verification</p>
         </div>
       </div>
 
-      {/* CSS for floating animation */}
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); opacity: 0.2; }
