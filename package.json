@@ -26,7 +26,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.575.0",
-    "next": "16.1.6",
+    "next": "16.3.3",
     "openai": "^6.22.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -44,5 +44,27 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "axios": "1.20.0",
+    "sharp": "0.35.4",
+    "js-yaml": "4.3.2",
+    "toml": "4.2.0",
+    "nanoid": "5.1.16",
+    "browserslist": "4.28.7",
+    "jsondiffpatch": "0.7.6",
+    "ip-address": "10.3.1",
+    "socket.io-parser": "4.2.7",
+    "postcss": "8.5.18",
+    "brace-expansion": "5.0.7",
+    "protobufjs": "8.4.1",
+    "form-data": "4.0.6",
+    "ws": "8.21.0",
+    "defu": "6.1.5",
+    "lodash-es": "4.18.0",
+    "lodash": "4.18.0",
+    "picomatch": "4.0.4",
+    "flatted": "3.4.2",
+    "minimatch": "10.2.3"
   }
 }
