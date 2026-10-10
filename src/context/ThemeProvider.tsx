@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react';
 
 type Theme = 'dark' | 'light';
 
@@ -14,36 +14,37 @@ const ThemeContext = createContext<ThemeContextType>({
   toggleTheme: () => {},
 });
 
+const THEME_KEY = 'emet-theme';
+const THEME_EVENT = 'emet-theme-change';
+
+function readTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+  const saved = window.localStorage.getItem(THEME_KEY);
+  return saved === 'light' ? 'light' : 'dark';
+}
+
+function subscribe(callback: () => void) {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === THEME_KEY) callback();
+  };
+  window.addEventListener('storage', handleStorage);
+  window.addEventListener(THEME_EVENT, callback);
+  return () => {
+    window.removeEventListener('storage', handleStorage);
+    window.removeEventListener(THEME_EVENT, callback);
+  };
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('emet-theme') as Theme | null;
-    if (saved && (saved === 'dark' || saved === 'light')) {
-      setTheme(saved);
-    }
-    setIsMounted(true);
-  }, []);
-
-  // Update DOM and localStorage when theme changes
-  useEffect(() => {
-    if (!isMounted) return;
-
-    document.documentElement.classList.remove('dark', 'light');
-    document.documentElement.classList.add(theme);
-    localStorage.setItem('emet-theme', theme);
-  }, [theme, isMounted]);
+  const theme = useSyncExternalStore(subscribe, readTheme, () => 'dark');
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(next);
+    window.localStorage.setItem(THEME_KEY, next);
+    window.dispatchEvent(new Event(THEME_EVENT));
   };
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!isMounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

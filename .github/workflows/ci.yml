@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'agent/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+      GROQ_API_KEY: ci-groq-key
+      GOOGLE_GENERATIVE_AI_API_KEY: ci-google-key
+      OPENAI_API_KEY: ci-openai-key
+      ANTHROPIC_API_KEY: ci-anthropic-key
+      NEXT_PUBLIC_SOLANA_RPC_URL: https://api.devnet.solana.com
+      NEXT_PUBLIC_SOLANA_NETWORK: devnet
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      JWT_SECRET: ci-jwt-secret-that-is-at-least-thirty-two-characters
+      EMET_INGEST_SECRET: ci-ingest-secret-that-is-at-least-thirty-two-characters
+      EMET_SIGNALS_SECRET: ci-signals-secret-that-is-at-least-thirty-two-characters
+      CENSUS_API_KEY: ci-census-key
+      CMS_PROVIDER_DATASET_ID: xubh-q36u
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          package-manager-cache: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high

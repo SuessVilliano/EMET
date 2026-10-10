@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react'
+import { createContext, useContext, useMemo, type ReactNode, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import type { User } from '@/lib/types'
@@ -26,34 +26,26 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { publicKey, connected, disconnect: walletDisconnect, connecting } = useWallet()
   const { setVisible } = useWalletModal()
-  const [user, setUser] = useState<User | null>(null)
+  const walletAddress = publicKey?.toBase58() || null
 
-  // Sync wallet connection state to user
-  useEffect(() => {
-    if (connected && publicKey) {
-      const addr = publicKey.toBase58()
-      setUser({
-        id: crypto.randomUUID(),
-        wallet_address: addr,
-        role: 'member',
-        reputation_score: 0,
-        created_at: new Date().toISOString(),
-      })
-    } else if (!connected) {
-      setUser(null)
+  const user = useMemo<User | null>(() => {
+    if (!connected || !walletAddress) return null
+    return {
+      id: `wallet:${walletAddress}`,
+      wallet_address: walletAddress,
+      role: 'member',
+      reputation_score: 0,
+      created_at: '',
     }
-  }, [connected, publicKey])
+  }, [connected, walletAddress])
 
   const connect = useCallback(async () => {
     setVisible(true)
   }, [setVisible])
 
   const disconnect = useCallback(() => {
-    walletDisconnect()
-    setUser(null)
+    void walletDisconnect()
   }, [walletDisconnect])
-
-  const walletAddress = publicKey?.toBase58() || null
 
   return (
     <AuthContext.Provider
@@ -71,10 +63,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
+export const useAuth = () => useContext(AuthContext)
